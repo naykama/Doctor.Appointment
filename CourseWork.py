@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from Patient import Ui_DialogPatientName
 from Fix import Ui_DialogFix
 from Doctor import Ui_DialogDoctor
+from Lunch import Ui_DialogLunch
 import sys
  
 class mywindow(QtWidgets.QMainWindow):
@@ -40,6 +41,11 @@ class fixwindow(QtWidgets.QDialog):
         super(fixwindow, self).__init__()
         self.ui = Ui_DialogFix()
         self.ui.setupUi(self)
+        self.ui.buttonLunch.clicked.connect(self.show_lunch_window)
+        
+    def show_lunch_window(self):
+        self.w2 = lunchwindow()
+        self.w2.show()
 
 class doctorwindow(QtWidgets.QDialog):
     def __init__(self):
@@ -47,6 +53,12 @@ class doctorwindow(QtWidgets.QDialog):
         self.ui = Ui_DialogDoctor()
         self.ui.setupUi(self)
         self.ui.pushButton_2.clicked.connect(self.close)
+
+class lunchwindow(QtWidgets.QDialog):
+    def __init__(self):
+        super(lunchwindow, self).__init__()
+        self.ui = Ui_DialogLunch()
+        self.ui.setupUi(self)        
     
 
 if __name__ == '__main__':

@@ -108,7 +108,7 @@
     <string>Время</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="writeButton">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -121,7 +121,7 @@
     <string>Записать</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="backButton">
    <property name="geometry">
     <rect>
      <x>30</x>

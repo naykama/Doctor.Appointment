@@ -48,9 +48,9 @@ class Ui_DialogPatientName(object):
         self.comboBoxPatient = QtWidgets.QComboBox(DialogPatientName)
         self.comboBoxPatient.setGeometry(QtCore.QRect(50, 150, 551, 22))
         self.comboBoxPatient.setObjectName("comboBoxPatient")
-        self.pushButton = QtWidgets.QPushButton(DialogPatientName)
-        self.pushButton.setGeometry(QtCore.QRect(510, 220, 111, 41))
-        self.pushButton.setObjectName("pushButton")
+        self.continueButton = QtWidgets.QPushButton(DialogPatientName)
+        self.continueButton.setGeometry(QtCore.QRect(510, 220, 111, 41))
+        self.continueButton.setObjectName("continueButton")
 
         self.retranslateUi(DialogPatientName)
         QtCore.QMetaObject.connectSlotsByName(DialogPatientName)
@@ -58,9 +58,9 @@ class Ui_DialogPatientName(object):
     def retranslateUi(self, DialogPatientName):
         _translate = QtCore.QCoreApplication.translate
         DialogPatientName.setWindowTitle(_translate("DialogPatientName", "Пациент"))
-        self.label.setText(_translate("DialogPatientName", "Фимилия"))
+        self.label.setText(_translate("DialogPatientName", "Фамилия"))
         self.label_2.setText(_translate("DialogPatientName", "Имя"))
         self.label_3.setText(_translate("DialogPatientName", "Отчество"))
         self.label_4.setText(_translate("DialogPatientName", "Дата рождения"))
         self.label_5.setText(_translate("DialogPatientName", "Телефон"))
-        self.pushButton.setText(_translate("DialogPatientName", "Далее"))
+        self.continueButton.setText(_translate("DialogPatientName", "Далее"))

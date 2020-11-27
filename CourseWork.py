@@ -18,11 +18,11 @@ class mainwindow(QtWidgets.QMainWindow):
        
     def show_patient_window(self):
         self.patientW = patientwindow()
-        self.patientW.show()
+        self.patientW.exec()
 
     def show_fix_window(self):
         self.fixW = fixwindow()
-        self.fixW.show()
+        self.fixW.exec()
         
 class patientwindow(QtWidgets.QDialog):
     def __init__(self):
@@ -30,11 +30,10 @@ class patientwindow(QtWidgets.QDialog):
         self.ui = Ui_DialogPatientName()
         self.ui.setupUi(self)
         self.ui.continueButton.clicked.connect(self.button_click)
-##        self.patientwindow.setWindowModality(QtCore.Qt.WindowModal)
 
     def show_doctor_window(self):
-        self.w2 = doctorwindow()
-        self.w2.show()
+        self.doctorW = doctorwindow()
+        self.doctorW.exec()
         
     def button_click(self):        
         surname = self.ui.lineEditSurname.text()
@@ -52,8 +51,8 @@ class fixwindow(QtWidgets.QDialog):
         self.ui.buttonLunch.clicked.connect(self.show_lunch_window)
         
     def show_lunch_window(self):
-        self.w2 = lunchwindow()
-        self.w2.show()
+        self.lunchW = lunchwindow()
+        self.lunchW.exec()
 
 class doctorwindow(QtWidgets.QDialog):
     def __init__(self):

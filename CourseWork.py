@@ -31,7 +31,24 @@ class patientwindow(QtWidgets.QDialog):
         self.ui = Ui_DialogPatientName()
         self.ui.setupUi(self)
         self.ui.continueButton.clicked.connect(self.button_click)
-
+        for i in patientDict:
+            self.ui.comboBoxPatient.addItem(patientDict[i].surname+' '+patientDict[i].name+' '
+                                            +patientDict[i].patronimic + ' '
+                                            +patientDict[i].birthday)
+        self.ui.comboBoxPatient.activated[str].connect(self.onActivated)
+        
+    def onActivated(self,text):
+        for i in patientDict:
+            if (patientDict[i].surname+' '+patientDict[i].name+' '
+                +patientDict[i].patronimic + ' '
+                +patientDict[i].birthday == text):
+                self.ui.lineEditSurname.setText(patientDict[i].surname)
+                self.ui.lineEditName.setText(patientDict[i].name)
+                self.ui.lineEditPatron.setText(patientDict[i].patronimic)
+                self.ui.lineEditBirthday.setText(patientDict[i].birthday)
+                self.ui.lineEditPhone.setText(patientDict[i].phone)
+                pass
+        
     def show_doctor_window(self):
         self.doctorW = doctorwindow()
         self.doctorW.exec()
@@ -42,6 +59,9 @@ class patientwindow(QtWidgets.QDialog):
         patronimic = self.ui.lineEditPatron.text()
         bdate = self.ui.lineEditBirthday.text()
         phone = self.ui.lineEditPhone.text()
+        p_key = max(patientDict.keys())+1
+        global new_patient
+        new_patient = Patient(str(p_key), surname, name, patronimic, bdate, phone)
         self.show_doctor_window()
 
 class fixwindow(QtWidgets.QDialog):
@@ -60,10 +80,13 @@ class doctorwindow(QtWidgets.QDialog):
         super(doctorwindow, self).__init__()
         self.ui = Ui_DialogDoctor()
         self.ui.setupUi(self)
-        self.ui.backButton.clicked.connect(self.close)
-        self.ui.writeButton.clicked.connect(self.close_windows)
+        self.ui.backButton.clicked.connect(self.come_back_patient)
+        self.ui.writeButton.clicked.connect(self.do_record)
+
+    def come_back_patient(self):
+        self.close()
         
-    def close_windows(self):
+    def do_record(self):
         self.close()
         mainW.patientW.close()
         
@@ -166,7 +189,7 @@ patientDict = {}
 doctorDict = {}
 sheduleDict = {}
 receptionDict = {}
-
+new_patient = Patient("0","","","","","")
 patientRead()
 doctorRead()
 sheduleRead()
@@ -183,3 +206,4 @@ if __name__ == '__main__':
     mainW = mainwindow()
     mainW.show()
     sys.exit(app.exec_())
+

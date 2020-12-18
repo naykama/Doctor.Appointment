@@ -123,9 +123,17 @@ class doctorwindow(QtWidgets.QDialog):
                 beginT = DT.strptime(sheduleDict[i].beginTime, '%H:%M')
                 endT = DT.strptime(sheduleDict[i].endTime, '%H:%M')
         breaktime = DT.strptime('12:00', '%H:%M')
+     
+                
         if (beginT <= breaktime):
             while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=breaktime):
-                self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
+                for i in receptionDict:
+                    if (receptionDict[i].doctorID == d_id and
+                        receptionDict[i].date == text and
+                        receptionDict[i].time == beginT.strftime('%H:%M')):
+                        pass
+                    else:
+                        self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
                 beginT = beginT + timedelta(minutes=int(doctorDict[d_id].time))
         beginT = breaktime + timedelta(hours = 1)
         while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=endT):

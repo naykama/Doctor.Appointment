@@ -78,6 +78,8 @@ class fixwindow(QtWidgets.QDialog):
 
 class doctorwindow(QtWidgets.QDialog):
     d_id = -1
+    r_date = ""
+    n_time = ""
     def __init__(self):
         super(doctorwindow, self).__init__()
         self.ui = Ui_DialogDoctor()
@@ -107,7 +109,7 @@ class doctorwindow(QtWidgets.QDialog):
             if (doctorDict[i].surname +' '+ doctorDict[i].name[0] +
                 '. ' + doctorDict[i].patronimic[0]+'.' == text):
                 global d_id
-                d_id = doctorDict[i].ID
+                d_id = doctorDict[i].ID        
         for i in sheduleDict:
             if (sheduleDict[i].doctorID == d_id):
                 self.ui.comboBoxDay.addItem(sheduleDict[i].date)
@@ -118,6 +120,8 @@ class doctorwindow(QtWidgets.QDialog):
             self.ui.comboBoxTime.clear()
         beginT = ''
         endT = ''
+        global r_date
+        r_date = text
         for i in sheduleDict:
             if (sheduleDict[i].date == text and sheduleDict[i].doctorID == d_id):
                 beginT = DT.strptime(sheduleDict[i].beginTime, '%H:%M')
@@ -139,11 +143,36 @@ class doctorwindow(QtWidgets.QDialog):
         while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=endT):
             self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
             beginT = beginT + timedelta(minutes=int(doctorDict[d_id].time))
+        self.ui.comboBoxTime.activated[str].connect(self.onActivatedTime)
+    def onActivatedTime(self,text):
+        global n_time
+        n_time = text
+        global new_reception
+        new_reception = Reception(str(d_id), str(new_patient.ID), r_date, text)
                 
     def come_back_patient(self):
         self.close()
         
     def do_record(self):
+        is_new_p = True
+        p_id = new_patient.ID
+        for i in patientDict:
+            if (new_patient.surname == patientDict[i].surname and
+                new_patient.name == patientDict[i].name and
+                new_patient.patronimic == patientDict[i].patronimic and
+                new_patient.birthday == patientDict[i].birthday and
+                new_patient.phone == patientDict[i].phone):
+                is_new_p = False
+                p_id = i
+                pass
+        if (is_new_p):
+            patientDict[max(patientDict.keys())+1] = new_patient
+        else:
+            global new_reception
+            new_reception = Reception(str(d_id), str(p_id), r_date, n_time)
+        receptionDict[max(receptionDict.keys())+1] = new_reception
+        patientWrite()
+        receptionWrite()
         self.close()
         mainW.patientW.close()
         
@@ -247,6 +276,7 @@ doctorDict = {}
 sheduleDict = {}
 receptionDict = {}
 new_patient = Patient("0","","","","","")
+new_reception = Reception("0","0","","")
 patientRead()
 doctorRead()
 sheduleRead()

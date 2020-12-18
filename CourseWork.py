@@ -8,7 +8,8 @@ from Doctor import Ui_DialogDoctor
 from Lunch import Ui_DialogLunch
 import sys
 import csv
- 
+from datetime import datetime as DT, timedelta
+
 class mainwindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(mainwindow, self).__init__()
@@ -82,7 +83,52 @@ class doctorwindow(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.ui.backButton.clicked.connect(self.come_back_patient)
         self.ui.writeButton.clicked.connect(self.do_record)
-
+        profile_set = set()
+        for i in doctorDict:
+            if ( doctorDict[i].profile in profile_set):
+                pass
+            else:
+                self.ui.comboBoxProf.addItem(doctorDict[i].profile)
+                profile_set.add(doctorDict[i].profile)
+        self.ui.comboBoxProf.activated[str].connect(self.onActivatedProf)
+    def onActivatedProf(self, text):
+        if (self.ui.comboBoxFIO.count != 0):
+            self.ui.comboBoxFIO.clear()
+        for i in doctorDict:
+            if (doctorDict[i].profile == text):
+                self.ui.comboBoxFIO.addItem(doctorDict[i].surname +' '+ doctorDict[i].name[0] +
+                                            '. ' + doctorDict[i].patronimic[0]+'.')
+        self.ui.comboBoxFIO.activated[str].connect(self.onActivatedFIO)
+    def onActivatedFIO(self,text):
+        if (self.ui.comboBoxDay.count != 0):
+            self.ui.comboBoxDay.clear()
+        d_id = -1
+        for i in doctorDict:
+            if (doctorDict[i].surname +' '+ doctorDict[i].name[0] +
+                '. ' + doctorDict[i].patronimic[0]+'.' == text):
+                d_id = doctorDict[i].ID
+        for i in sheduleDict:
+            if (sheduleDict[i].doctorID == d_id):
+                self.ui.comboBoxDay.addItem(sheduleDict[i].date)
+        self.ui.comboBoxDay.activated[str].connect(self.onActivatedDay)
+        
+    def onActivatedDay(self,text):
+        if (self.ui.comboBoxTime.count != 0):
+            self.ui.comboBoxTime.clear()
+        beginT = ''
+        endT = ''
+        for i in sheduleDict:
+            if (sheduleDict[i].date == text):
+                self.ui.comboBoxTime.addItem(sheduleDict[i].beginTime)
+                beginT = DT.strptime(sheduleDict[i].beginTime, '%H:%M')
+                endT = DT.strptime(sheduleDict[i].endTime, '%H:%M')                
+                print(type(beginT))
+            pass
+## 
+##            self.ui.comboBoxTime.addItem(doctorDict[i].time)
+##            self.ui.comboBoxDay.addItem(doctorDict[i].day)
+##        self.ui.comboBoxPatient.activated[str].connect(self.onActivated)
+        
     def come_back_patient(self):
         self.close()
         

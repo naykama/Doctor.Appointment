@@ -77,6 +77,7 @@ class fixwindow(QtWidgets.QDialog):
         self.lunchW.exec()
 
 class doctorwindow(QtWidgets.QDialog):
+    d_id = -1
     def __init__(self):
         super(doctorwindow, self).__init__()
         self.ui = Ui_DialogDoctor()
@@ -102,10 +103,10 @@ class doctorwindow(QtWidgets.QDialog):
     def onActivatedFIO(self,text):
         if (self.ui.comboBoxDay.count != 0):
             self.ui.comboBoxDay.clear()
-        d_id = -1
         for i in doctorDict:
             if (doctorDict[i].surname +' '+ doctorDict[i].name[0] +
                 '. ' + doctorDict[i].patronimic[0]+'.' == text):
+                global d_id
                 d_id = doctorDict[i].ID
         for i in sheduleDict:
             if (sheduleDict[i].doctorID == d_id):
@@ -118,17 +119,19 @@ class doctorwindow(QtWidgets.QDialog):
         beginT = ''
         endT = ''
         for i in sheduleDict:
-            if (sheduleDict[i].date == text):
-                self.ui.comboBoxTime.addItem(sheduleDict[i].beginTime)
+            if (sheduleDict[i].date == text and sheduleDict[i].doctorID == d_id):
                 beginT = DT.strptime(sheduleDict[i].beginTime, '%H:%M')
-                endT = DT.strptime(sheduleDict[i].endTime, '%H:%M')                
-                print(type(beginT))
-            pass
-## 
-##            self.ui.comboBoxTime.addItem(doctorDict[i].time)
-##            self.ui.comboBoxDay.addItem(doctorDict[i].day)
-##        self.ui.comboBoxPatient.activated[str].connect(self.onActivated)
-        
+                endT = DT.strptime(sheduleDict[i].endTime, '%H:%M')
+        breaktime = DT.strptime('12:00', '%H:%M')
+        if (beginT <= breaktime):
+            while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=breaktime):
+                self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
+                beginT = beginT + timedelta(minutes=int(doctorDict[d_id].time))
+        beginT = breaktime + timedelta(hours = 1)
+        while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=endT):
+            self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
+            beginT = beginT + timedelta(minutes=int(doctorDict[d_id].time))
+                
     def come_back_patient(self):
         self.close()
         

@@ -118,8 +118,9 @@ class doctorwindow(QtWidgets.QDialog):
     def onActivatedDay(self,text):
         if (self.ui.comboBoxTime.count != 0):
             self.ui.comboBoxTime.clear()
-        beginT = ''
-        endT = ''
+##        Время начала приёма
+        beginT = DT.strptime('00:00', '%H:%M')
+        endT = DT.strptime('00:00', '%H:%M')
         global r_date
         r_date = text
         for i in sheduleDict:
@@ -127,22 +128,19 @@ class doctorwindow(QtWidgets.QDialog):
                 beginT = DT.strptime(sheduleDict[i].beginTime, '%H:%M')
                 endT = DT.strptime(sheduleDict[i].endTime, '%H:%M')
         breaktime = DT.strptime('12:00', '%H:%M')
-     
-                
-        if (beginT <= breaktime):
-            while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=breaktime):
-                for i in receptionDict:
-                    if (receptionDict[i].doctorID == d_id and
-                        receptionDict[i].date == text and
-                        receptionDict[i].time == beginT.strftime('%H:%M')):
-                        pass
-                    else:
-                        self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
-                beginT = beginT + timedelta(minutes=int(doctorDict[d_id].time))
-        beginT = breaktime + timedelta(hours = 1)
-        while (beginT +timedelta(minutes=int(doctorDict[d_id].time))<=endT):
-            self.ui.comboBoxTime.addItem(beginT.strftime('%H:%M'))
-            beginT = beginT + timedelta(minutes=int(doctorDict[d_id].time))
+        r_time = beginT
+        r_min = int(doctorDict[d_id].time)
+        while (r_time +timedelta(minutes=r_min)<=endT):
+            if (str(d_id)+r_date+r_time.strftime('%H:%M') in receptionDict.keys()):
+                r_time = r_time + timedelta(minutes=int(doctorDict[d_id].time))
+                pass
+            else:
+                if(r_time +timedelta(minutes=r_min)>breaktime and
+                    r_time +timedelta(minutes=r_min)<=breaktime+timedelta(hours = 1)):
+                    r_time = breaktime+timedelta(hours = 1)
+                else:
+                    self.ui.comboBoxTime.addItem(r_time.strftime('%H:%M'))
+                    r_time = r_time + timedelta(minutes=int(doctorDict[d_id].time))
         self.ui.comboBoxTime.activated[str].connect(self.onActivatedTime)
     def onActivatedTime(self,text):
         global n_time
@@ -170,7 +168,8 @@ class doctorwindow(QtWidgets.QDialog):
         else:
             global new_reception
             new_reception = Reception(str(d_id), str(p_id), r_date, n_time)
-        receptionDict[max(receptionDict.keys())+1] = new_reception
+        receptionDict[str(new_reception.doctorID)+new_reception.date
+                      +new_reception.time] = new_reception
         patientWrite()
         receptionWrite()
         self.close()
@@ -254,11 +253,11 @@ def sheduleRead():
 def receptionRead():
     with open("Reception.csv") as r_f:
         file_reader = csv.DictReader(r_f, delimiter = ";")
-        count = 0;
+##        count = 0;
         for row in file_reader:
             reception = Reception( row["Врач_ID"], row["Пациент_ID"],row["Дата"],row["Время"])
-            receptionDict[count] = reception
-            count+=1
+            receptionDict[str(reception.doctorID) + reception.date + reception.time] = reception
+##            count+=1
 
 def receptionWrite():
     with open("Reception.csv", mode="w", newline='') as wreceptionF:

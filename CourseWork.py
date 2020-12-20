@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from CourseWorkQt import Ui_MainWindow
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QMessageBox
 from PyQt5.QtCore import pyqtSignal, QObject
 from Patient import Ui_DialogPatientName
 from Fix import Ui_DialogFix
@@ -9,6 +9,9 @@ from Lunch import Ui_DialogLunch
 import sys
 import csv
 from datetime import datetime as DT, timedelta
+import subprocess
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot
 
 class mainwindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -51,8 +54,13 @@ class patientwindow(QtWidgets.QDialog):
                 pass
         
     def show_doctor_window(self):
-        self.doctorW = doctorwindow()
-        self.doctorW.exec()
+        if (self.ui.lineEditSurname.text()=='' or self.ui.lineEditName.text()==''
+            or self.ui.lineEditBirthday.text()==''
+            or self.ui.lineEditPhone.text()==''):
+                QMessageBox.about(self, "Некорректный ввод", "Не все обязательные поля заполнены! (Фамилия, имя, дата рождения, телефон)")
+        else:
+            self.doctorW = doctorwindow()
+            self.doctorW.exec()
         
     def button_click(self):        
         surname = self.ui.lineEditSurname.text()
@@ -71,10 +79,25 @@ class fixwindow(QtWidgets.QDialog):
         self.ui = Ui_DialogFix()
         self.ui.setupUi(self)
         self.ui.buttonLunch.clicked.connect(self.show_lunch_window)
-        
+        self.ui.buttonDoctors.clicked.connect(self.show_file_doctors)
+        self.ui.buttonShedule.clicked.connect(self.show_file_shedule)
+        self.ui.buttonPatients.clicked.connect(self.show_file_patients)
+        self.ui.buttonRecord.clicked.connect(self.show_file_record)
     def show_lunch_window(self):
         self.lunchW = lunchwindow()
         self.lunchW.exec()
+    def show_file_doctors(self):
+        subprocess.Popen(('start', 'C:\\Ucheba\\course_2\\TechProg\\CourseWork\\Doctors.csv'),
+                         shell = True)
+    def show_file_shedule(self):
+        subprocess.Popen(('start', 'C:\\Ucheba\\course_2\\TechProg\\CourseWork\\Reception_shedule.csv'),
+                         shell = True)
+    def show_file_patients(self):
+        subprocess.Popen(('start', 'C:\\Ucheba\\course_2\\TechProg\\CourseWork\\Patient.csv'),
+                         shell = True)
+    def show_file_record(self):
+        subprocess.Popen(('start', 'C:\\Ucheba\\course_2\\TechProg\\CourseWork\\Reception.csv'),
+                         shell = True)
 
 class doctorwindow(QtWidgets.QDialog):
     d_id = -1

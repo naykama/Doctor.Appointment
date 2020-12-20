@@ -12,6 +12,8 @@ from datetime import datetime as DT, timedelta
 import subprocess
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
+import time
+import re
 
 class mainwindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -57,7 +59,9 @@ class patientwindow(QtWidgets.QDialog):
         if (self.ui.lineEditSurname.text()=='' or self.ui.lineEditName.text()==''
             or self.ui.lineEditBirthday.text()==''
             or self.ui.lineEditPhone.text()==''):
-                QMessageBox.about(self, "Некорректный ввод", "Не все обязательные поля заполнены! (Фамилия, имя, дата рождения, телефон)")
+                QMessageBox.about(self, "Некорректный ввод",
+                                  "Не все обязательные поля заполнены!"+
+                                  "(Фамилия, имя, дата рождения, телефон)")
         else:
             self.doctorW = doctorwindow()
             self.doctorW.exec()
@@ -66,12 +70,18 @@ class patientwindow(QtWidgets.QDialog):
         surname = self.ui.lineEditSurname.text()
         name = self.ui.lineEditName.text()
         patronimic = self.ui.lineEditPatron.text()
-        bdate = self.ui.lineEditBirthday.text()
-        phone = self.ui.lineEditPhone.text()
-        p_key = max(patientDict.keys())+1
-        global new_patient
-        new_patient = Patient(str(p_key), surname, name, patronimic, bdate, phone)
-        self.show_doctor_window()
+        try:
+            time.strptime(self.ui.lineEditBirthday.text(), '%d.%m.%Y')
+        except ValueError:
+            QMessageBox.about(self, "Некорректный ввод",
+                              "Введите дату в формате ДД.ММ.ГГГГ")
+        else:
+            bdate = self.ui.lineEditBirthday.text()    
+            phone = self.ui.lineEditPhone.text()
+            p_key = max(patientDict.keys())+1
+            global new_patient
+            new_patient = Patient(str(p_key), surname, name, patronimic, bdate, phone)
+            self.show_doctor_window()
 
 class fixwindow(QtWidgets.QDialog):
     def __init__(self):

@@ -100,11 +100,13 @@ class fixwindow(QtWidgets.QDialog):
                          shell = True)
 
 class doctorwindow(QtWidgets.QDialog):
-    d_id = -1
-    r_date = ""
-    n_time = ""
     def __init__(self):
         super(doctorwindow, self).__init__()
+        self.d_id = -1
+        self.r_date = ""
+        self.n_time = ""
+        self.r_prof = ""
+        self.r_FIO = ""
         self.ui = Ui_DialogDoctor()
         self.ui.setupUi(self)
         self.ui.backButton.clicked.connect(self.come_back_patient)
@@ -120,6 +122,7 @@ class doctorwindow(QtWidgets.QDialog):
     def onActivatedProf(self, text):
         if (self.ui.comboBoxFIO.count != 0):
             self.ui.comboBoxFIO.clear()
+        self.r_prof = text
         for i in doctorDict:
             if (doctorDict[i].profile == text):
                 self.ui.comboBoxFIO.addItem(doctorDict[i].surname +' '+ doctorDict[i].name[0] +
@@ -128,13 +131,13 @@ class doctorwindow(QtWidgets.QDialog):
     def onActivatedFIO(self,text):
         if (self.ui.comboBoxDay.count != 0):
             self.ui.comboBoxDay.clear()
+        self.r_FIO = text
         for i in doctorDict:
             if (doctorDict[i].surname +' '+ doctorDict[i].name[0] +
                 '. ' + doctorDict[i].patronimic[0]+'.' == text):
-                global d_id
-                d_id = doctorDict[i].ID        
+                self.d_id = doctorDict[i].ID        
         for i in sheduleDict:
-            if (sheduleDict[i].doctorID == d_id):
+            if (sheduleDict[i].doctorID == self.d_id):
                 self.ui.comboBoxDay.addItem(sheduleDict[i].date)
         self.ui.comboBoxDay.activated[str].connect(self.onActivatedDay)
         
@@ -144,18 +147,17 @@ class doctorwindow(QtWidgets.QDialog):
 ##        Время начала приёма
         beginT = DT.strptime('00:00', '%H:%M')
         endT = DT.strptime('00:00', '%H:%M')
-        global r_date
-        r_date = text
+        self.r_date = text
         for i in sheduleDict:
-            if (sheduleDict[i].date == text and sheduleDict[i].doctorID == d_id):
+            if (sheduleDict[i].date == text and sheduleDict[i].doctorID == self.d_id):
                 beginT = DT.strptime(sheduleDict[i].beginTime, '%H:%M')
                 endT = DT.strptime(sheduleDict[i].endTime, '%H:%M')
         breaktime = DT.strptime('12:00', '%H:%M')
         r_time = beginT
-        r_min = int(doctorDict[d_id].time)
+        r_min = int(doctorDict[self.d_id].time)
         while (r_time +timedelta(minutes=r_min)<=endT):
-            if (str(d_id)+r_date+r_time.strftime('%H:%M') in receptionDict.keys()):
-                r_time = r_time + timedelta(minutes=int(doctorDict[d_id].time))
+            if (str(self.d_id)+self.r_date+r_time.strftime('%H:%M') in receptionDict.keys()):
+                r_time = r_time + timedelta(minutes=int(doctorDict[self.d_id].time))
                 pass
             else:
                 if(r_time +timedelta(minutes=r_min)>breaktime and
@@ -163,40 +165,45 @@ class doctorwindow(QtWidgets.QDialog):
                     r_time = breaktime+timedelta(hours = 1)
                 else:
                     self.ui.comboBoxTime.addItem(r_time.strftime('%H:%M'))
-                    r_time = r_time + timedelta(minutes=int(doctorDict[d_id].time))
+                    r_time = r_time + timedelta(minutes=int(doctorDict[self.d_id].time))
         self.ui.comboBoxTime.activated[str].connect(self.onActivatedTime)
     def onActivatedTime(self,text):
-        global n_time
-        n_time = text
+        self.n_time = text
         global new_reception
-        new_reception = Reception(str(d_id), str(new_patient.ID), r_date, text)
+        new_reception = Reception(str(self.d_id), str(new_patient.ID), self.r_date, text)
                 
     def come_back_patient(self):
         self.close()
         
     def do_record(self):
-        is_new_p = True
-        p_id = new_patient.ID
-        for i in patientDict:
-            if (new_patient.surname == patientDict[i].surname and
-                new_patient.name == patientDict[i].name and
-                new_patient.patronimic == patientDict[i].patronimic and
-                new_patient.birthday == patientDict[i].birthday and
-                new_patient.phone == patientDict[i].phone):
-                is_new_p = False
-                p_id = i
-                pass
-        if (is_new_p):
-            patientDict[max(patientDict.keys())+1] = new_patient
+        if (self.r_date == "" or self.n_time == "" or self.r_prof == ""
+            or self.r_FIO == ""):
+            QMessageBox.about(
+                self, "Некорректный ввод",
+                "Выбирите значение во всех элементах!")
         else:
-            global new_reception
-            new_reception = Reception(str(d_id), str(p_id), r_date, n_time)
-        receptionDict[str(new_reception.doctorID)+new_reception.date
+            is_new_p = True
+            p_id = new_patient.ID
+            for i in patientDict:
+                if (new_patient.surname == patientDict[i].surname and
+                    new_patient.name == patientDict[i].name and
+                    new_patient.patronimic == patientDict[i].patronimic and
+                    new_patient.birthday == patientDict[i].birthday and
+                    new_patient.phone == patientDict[i].phone):
+                    is_new_p = False
+                    p_id = i
+            if (is_new_p):
+                patientDict[max(patientDict.keys())+1] = new_patient
+            else:
+                global new_reception
+                new_reception = Reception(str(self.d_id), str(p_id), self.r_date,
+                                          self.n_time)
+            receptionDict[str(new_reception.doctorID)+new_reception.date
                       +new_reception.time] = new_reception
-        patientWrite()
-        receptionWrite()
-        self.close()
-        mainW.patientW.close()
+            patientWrite()
+            receptionWrite()
+            self.close()
+            mainW.patientW.close()
         
             
 class lunchwindow(QtWidgets.QDialog):

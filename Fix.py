@@ -27,9 +27,6 @@ class Ui_DialogFix(object):
         self.buttonRecord = QtWidgets.QPushButton(DialogFix)
         self.buttonRecord.setGeometry(QtCore.QRect(240, 110, 91, 31))
         self.buttonRecord.setObjectName("buttonRecord")
-        self.buttonLunch = QtWidgets.QPushButton(DialogFix)
-        self.buttonLunch.setGeometry(QtCore.QRect(180, 210, 181, 41))
-        self.buttonLunch.setObjectName("buttonLunch")
 
         self.retranslateUi(DialogFix)
         QtCore.QMetaObject.connectSlotsByName(DialogFix)
@@ -41,4 +38,3 @@ class Ui_DialogFix(object):
         self.buttonShedule.setText(_translate("DialogFix", "Расписание"))
         self.buttonPatients.setText(_translate("DialogFix", "Пациенты"))
         self.buttonRecord.setText(_translate("DialogFix", "Запись"))
-        self.buttonLunch.setText(_translate("DialogFix", "Обеденный перерыв"))

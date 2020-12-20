@@ -88,14 +88,10 @@ class fixwindow(QtWidgets.QDialog):
         super(fixwindow, self).__init__()
         self.ui = Ui_DialogFix()
         self.ui.setupUi(self)
-        self.ui.buttonLunch.clicked.connect(self.show_lunch_window)
         self.ui.buttonDoctors.clicked.connect(self.show_file_doctors)
         self.ui.buttonShedule.clicked.connect(self.show_file_shedule)
         self.ui.buttonPatients.clicked.connect(self.show_file_patients)
         self.ui.buttonRecord.clicked.connect(self.show_file_record)
-    def show_lunch_window(self):
-        self.lunchW = lunchwindow()
-        self.lunchW.exec()
     def show_file_doctors(self):
         subprocess.Popen(('start', 'C:\\Ucheba\\course_2\\TechProg\\CourseWork\\Doctors.csv'),
                          shell = True)
@@ -190,7 +186,7 @@ class doctorwindow(QtWidgets.QDialog):
             or self.r_FIO == ""):
             QMessageBox.about(
                 self, "Некорректный ввод",
-                "Выбирите значение во всех элементах!")
+                "Выберите значение во всех элементах!")
         else:
             is_new_p = True
             p_id = new_patient.ID
